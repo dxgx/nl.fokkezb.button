@@ -45,8 +45,8 @@ function applyProperties(properties) {
         _.defaults(_properties, Styles.get(_properties.style));
     }
 
-    if (properties.enabled === false) {
-        $.outer.touchEnabled = false;
+    if (properties.enabled === false || properties.enabled === "false") {
+        $.over.touchEnabled = false;
 
         if (_properties.disabledStyle) {
             _properties.enabledStyle = _.pick(_properties, _.keys(_properties.disabledStyle));
@@ -55,8 +55,8 @@ function applyProperties(properties) {
 
     } else {
 
-        if (properties.enabled === true) {
-            $.outer.touchEnabled = true;
+        if (properties.enabled === true || properties.enabled === "true") {
+            $.over.touchEnabled = true;
 
             if (_properties.enabledStyle) {
                 _.extend(_properties, _properties.enabledStyle);
@@ -101,6 +101,7 @@ function applyProperties(properties) {
     }
 
     _applyOuterProperties(_properties);
+    _applyOverProperties(properties);
     _applyInnerProperties(_properties);
 }
 
@@ -209,6 +210,20 @@ function _applyOuterProperties(properties) {
     }
 }
 
+function _applyOverProperties(properties) {
+     var apply = _.pick(properties,
+         'overBackgroundColor', 'borderRadius'
+     );
+
+     if (apply.overBackgroundColor) {
+         apply.backgroundColor = apply.overBackgroundColor;
+     }
+
+     if (_.size(apply)) {
+         $.over.applyProperties(apply);
+     }
+ }
+
 function _applyInnerProperties(properties) {
     var apply = {};
 
@@ -299,12 +314,16 @@ function _onTouchend(e) {
         _applyInnerProperties(_properties.defaultStyle);
     }
 
-    if (e.type === 'touchend') {
-        $.trigger('click', {
-            type: "click",
-            source: $
-        });
-    }
+}
+
+function _onClick(e) {
+
+    var event = {
+ 	    type: 'click',
+ 	    source: $
+ 	  };
+    $.fireEvent('click', event);
+
 }
 
 /*** EXPORTS ***/
